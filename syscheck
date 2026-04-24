@@ -1,0 +1,34 @@
+#!/usr/bin/env python3
+
+import subprocess
+
+def failed_services():
+	try:
+		out = subprocess.check_output(
+			["systemctl", "--failed", "--plain", "--no-legend"],
+			text=True
+		)
+	except:
+		return []
+
+	return [line.split()[0] for line in out.splitlines() if line]
+
+def print_report(failed):
+	print("=== syscheck ===")
+	print("")
+
+	if not failed:
+		print("no issues found")
+		return
+
+	print(f"[WARNING] {len(failed)} failed services")
+
+	for s in failed:
+		print(f"  - {s}")
+
+def main():
+	failed  = failed_services()
+	print_report(failed)
+
+if __name__ == "__main__":
+	main()
