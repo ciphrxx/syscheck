@@ -13,22 +13,53 @@ def failed_services():
 
 	return [line.split()[0] for line in out.splitlines() if line]
 
-def print_report(failed):
+def disk_usage():
+	try:
+		out = subprocess.check_output(
+			["df", "/"],
+			text=True
+		)
+	except:
+		return None
+
+	lines = out.splitlines()
+	if len(lines) < 2:
+		return None
+
+	parts = lines[1].split()
+	if len(parts) < 5:
+		return None
+
+	percent = parts[4].strip("%")
+	return int(percent)
+
+def print_report(failed, disk):
 	print("=== syscheck ===")
 	print("")
 
-	if not failed:
+	warnings = 0
+
+	if failed:
+		warnings += 1
+		print(f"[WARING] {len(failed)} failed services")
+
+		for s in failed:
+			print(f"  - {s}")
+
+		print("")
+
+	if disk is not None and disk >= 90:
+		warnings += 1
+		print(f"[WARNING] / is {disk}% full")
+		print("")
+
+	if warnings == 0:
 		print("no issues found")
-		return
-
-	print(f"[WARNING] {len(failed)} failed services")
-
-	for s in failed:
-		print(f"  - {s}")
 
 def main():
 	failed  = failed_services()
-	print_report(failed)
+	disk = disk_usage()
+	print_report(failed, disk)
 
 if __name__ == "__main__":
 	main()
