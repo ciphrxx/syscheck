@@ -41,7 +41,7 @@ def print_report(failed, disk):
 
 	if failed:
 		warnings += 1
-		print(f"[WARING] {len(failed)} failed services")
+		print(f"[WARNING] {len(failed)} failed services")
 
 		for s in failed:
 			print(f"  - {s}")
@@ -55,9 +55,13 @@ def print_report(failed, disk):
 
 	if warnings == 0:
 		print("no issues found")
+		return
+
+	print("summary:")
+	print(f" warnings: {warnings}")
 
 def main():
-	failed  = failed_services()
+	failed = failed_services()
 	disk = disk_usage()
 	print_report(failed, disk)
 
